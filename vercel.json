@@ -1,31 +1,6 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/forum",
-      "dest": "/forum.html"
-    },
-    {
-      "src": "/devs-matching",
-      "dest": "/devs-matching.html"
-    },
-    {
-      "src": "/project-board",
-      "dest": "/project-board.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  "outputDirectory": ".",
+  "cleanUrls": true,
+  "trailingSlash": false
 }
+
