@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lumos &mdash; Dev Match</title>
+  <meta name="description" content="Lumos Dev Match &mdash; Kriterlerine göre geliştirici bul veya akışa katıl."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:#000;color:#fff;overflow-x:hidden;min-height:100vh;}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-track{background:#000;}
+    ::-webkit-scrollbar-thumb{background:#FFD700;border-radius:999px;}
+
+    /* Gold shimmer */
+    .gold-shimmer{
+      background:linear-gradient(90deg,#CC9F00 0%,#FFD700 40%,#FFE44D 60%,#CC9F00 100%);
+      background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;animation:shimmer 3s linear infinite;
+    }
+    @keyframes shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+
+    /* ===== NAVBAR ===== */
+    .site-header{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:1200px;z-index:200;}
+    .navbar-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#000;border-radius:26px;padding:8px 10px;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);}
+    .nav-logo{display:flex;align-items:center;justify-content:center;height:44px;padding:0 20px;border-radius:999px;background:#fff;color:#000;font-weight:800;font-size:15px;letter-spacing:-0.03em;text-decoration:none;flex-shrink:0;transition:transform 0.3s ease;gap:8px;}
+    .nav-logo:hover{transform:scale(1.04);}
+    .nav-logo img{width:22px;height:22px;object-fit:contain;border-radius:50%;}
+    .nav-links{display:flex;align-items:center;justify-content:center;gap:2px;}
+    .nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-size:15px;font-weight:500;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.3s ease;letter-spacing:-0.02em;white-space:nowrap;}
+    .nav-link:hover{color:#fff;}
+    .nav-link iconify-icon{font-size:15px;opacity:0.6;flex-shrink:0;}
+    .nav-link.active{color:#FFD700;}
+    .nav-link.active iconify-icon{opacity:1;}
+    .nav-right{display:flex;align-items:center;justify-content:flex-end;}
+    .nav-cta-cluster{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.18);border-radius:999px;padding:3px 3px 3px 10px;}
+    .nav-notif-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.8);font-size:14px;font-weight:500;text-decoration:none;padding:8px 28px 8px 8px;position:relative;transition:opacity 0.2s;}
+    .nav-notif-link:hover{opacity:0.7;}
+    .notif-dot{position:absolute;top:5px;right:10px;width:6px;height:6px;background:#ff3b3b;border-radius:50%;border:1.5px solid #000;}
+    .nav-cta-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#000;font-size:14px;font-weight:600;padding:9px 16px;border-radius:999px;text-decoration:none;transition:all 0.3s ease;}
+    .nav-cta-btn:hover{background:#FFD700;}
+    @media(max-width:900px){.nav-links{display:none;}.notif-label{display:none;}}
+    @media(max-width:600px){.site-header{width:calc(100% - 1rem);}}
+
+    /* ===== SOCIAL SIDEBAR ===== */
+    .social-sidebar{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .social-sidebar::before,.social-sidebar::after{content:"";display:block;width:1px;height:50px;}
+    .social-sidebar::before{background:linear-gradient(to bottom,transparent,rgba(255,215,0,0.3));}
+    .social-sidebar::after{background:linear-gradient(to top,transparent,rgba(255,215,0,0.3));}
+    .social-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.45);text-decoration:none;transition:all 0.3s ease;font-size:15px;}
+    .social-btn:hover{border-color:rgba(255,215,0,0.5);color:#FFD700;background:rgba(255,215,0,0.08);transform:scale(1.12);box-shadow:0 0 12px rgba(255,215,0,0.25);}
+    @media(max-width:1100px){.social-sidebar{display:none;}}
+
+    /* ===== FILTER PANEL (LEFT) ===== */
+    .filter-panel{
+      width:280px;flex-shrink:0;
+      background:rgba(10,10,15,0.9);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:20px;padding:24px;
+      display:flex;flex-direction:column;gap:20px;
+      position:sticky;top:90px;max-height:calc(100vh - 110px);
+      overflow-y:auto;
+    }
+    .filter-panel::-webkit-scrollbar{width:3px;}
+    .filter-panel::-webkit-scrollbar-thumb{background:rgba(255,215,0,0.3);border-radius:999px;}
+
+    .filter-section-title{
+      font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+      color:rgba(255,255,255,0.3);margin-bottom:10px;
+    }
+
+    /* Category Tabs */
+    .cat-tabs{display:flex;flex-direction:column;gap:4px;}
+    .cat-tab{
+      display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;
+      cursor:pointer;border:1px solid transparent;transition:all 0.2s;
+      font-size:0.82rem;font-weight:500;color:rgba(255,255,255,0.5);
+      background:transparent;width:100%;text-align:left;
+    }
+    .cat-tab:hover{color:#fff;background:rgba(255,255,255,0.04);}
+    .cat-tab.active{
+      background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.25);
+      color:#FFD700;
+    }
+    .cat-tab iconify-icon{font-size:16px;flex-shrink:0;}
+    .cat-count{margin-left:auto;font-size:0.68rem;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);}
+    .cat-tab.active .cat-count{background:rgba(255,215,0,0.15);color:#FFD700;}
+
+    /* Skill checkboxes */
+    .skill-group{display:none;flex-direction:column;gap:4px;margin-top:4px;}
+    .skill-group.visible{display:flex;}
+    .skill-check{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:background 0.2s;}
+    .skill-check:hover{background:rgba(255,255,255,0.03);}
+    .skill-check input[type="checkbox"]{
+      appearance:none;width:15px;height:15px;border:1.5px solid rgba(255,255,255,0.2);
+      border-radius:4px;flex-shrink:0;cursor:pointer;position:relative;transition:all 0.2s;
+    }
+    .skill-check input[type="checkbox"]:checked{
+      background:#FFD700;border-color:#FFD700;
+    }
+    .skill-check input[type="checkbox"]:checked::after{
+      content:"✓";position:absolute;font-size:9px;color:#000;font-weight:900;
+      top:50%;left:50%;transform:translate(-50%,-50%);
+    }
+    .skill-check label{font-size:0.8rem;color:rgba(255,255,255,0.6);cursor:pointer;display:flex;align-items:center;gap:6px;}
+    .skill-check:has(input:checked) label{color:#fff;}
+    .skill-lang-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+    /* Range sliders */
+    .slider-wrap{display:flex;flex-direction:column;gap:6px;}
+    .slider-label{display:flex;justify-content:space-between;align-items:center;}
+    .slider-label span{font-size:0.78rem;color:rgba(255,255,255,0.5);}
+    .slider-val{font-size:0.78rem;font-weight:700;color:#FFD700;}
+    input[type="range"]{
+      -webkit-appearance:none;width:100%;height:4px;border-radius:999px;
+      background:rgba(255,255,255,0.1);outline:none;cursor:pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+      background:#FFD700;cursor:pointer;border:2px solid #000;
+      box-shadow:0 0 8px rgba(255,215,0,0.5);
+    }
+
+    /* Star rating filter */
+    .star-filter{display:flex;gap:6px;flex-wrap:wrap;}
+    .star-opt{
+      display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.1);background:transparent;cursor:pointer;
+      font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.4);transition:all 0.2s;
+    }
+    .star-opt:hover{border-color:rgba(255,215,0,0.4);color:#FFD700;}
+    .star-opt.active{border-color:#FFD700;background:rgba(255,215,0,0.1);color:#FFD700;}
+    .star-opt iconify-icon{font-size:13px;color:#FFD700;}
+
+    /* ===== PROFILE TOGGLE (RIGHT) ===== */
+    .profile-panel{
+      width:300px;flex-shrink:0;
+      background:rgba(10,10,15,0.9);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:20px;padding:24px;
+      position:sticky;top:90px;max-height:calc(100vh - 110px);
+      overflow-y:auto;display:flex;flex-direction:column;gap:18px;
+    }
+
+    /* Toggle switch */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .toggle-label{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.7);}
+    .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+    .toggle-slider{
+      position:absolute;cursor:pointer;inset:0;border-radius:999px;
+      background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);
+      transition:all 0.3s ease;
+    }
+    .toggle-slider::before{
+      content:"";position:absolute;width:16px;height:16px;border-radius:50%;
+      background:#666;bottom:3px;left:3px;transition:all 0.3s ease;
+    }
+    .toggle-switch input:checked + .toggle-slider{
+      background:rgba(255,215,0,0.2);border-color:rgba(255,215,0,0.5);
+    }
+    .toggle-switch input:checked + .toggle-slider::before{
+      transform:translateX(20px);background:#FFD700;box-shadow:0 0 8px rgba(255,215,0,0.6);
+    }
+
+    .flow-status{
+      display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;
+      background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+      font-size:0.78rem;color:rgba(255,255,255,0.4);transition:all 0.3s;
+    }
+    .flow-status.active-flow{
+      background:rgba(255,215,0,0.06);border-color:rgba(255,215,0,0.2);color:rgba(255,215,0,0.8);
+    }
+    .flow-dot{width:8px;height:8px;border-radius:50%;background:#333;flex-shrink:0;transition:all 0.3s;}
+    .flow-status.active-flow .flow-dot{background:#FFD700;box-shadow:0 0 8px rgba(255,215,0,0.7);animation:pgold 2s ease-in-out infinite;}
+    @keyframes pgold{0%,100%{box-shadow:0 0 4px rgba(255,215,0,0.5);}50%{box-shadow:0 0 14px rgba(255,215,0,0.9);}}
+
+    /* Profile skill chips */
+    .profile-skill-area{display:flex;flex-wrap:wrap;gap:6px;}
+    .p-chip{
+      display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);
+      font-size:0.73rem;font-weight:600;color:rgba(255,255,255,0.6);cursor:pointer;
+      transition:all 0.2s;user-select:none;
+    }
+    .p-chip:hover{border-color:rgba(255,215,0,0.4);color:#FFD700;}
+    .p-chip.selected{border-color:#FFD700;background:rgba(255,215,0,0.1);color:#FFD700;}
+    .p-chip iconify-icon{font-size:12px;}
+
+    /* ===== CARDS GRID ===== */
+    .dev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+    .dev-card{
+      background:linear-gradient(145deg,#0A0A0F,#060609);
+      border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:20px;
+      transition:all 0.35s ease;cursor:pointer;position:relative;overflow:hidden;
+    }
+    .dev-card::before{content:"";position:absolute;inset:0;border-radius:18px;
+      background:linear-gradient(135deg,rgba(255,215,0,0.05) 0%,transparent 60%);opacity:0;transition:opacity 0.35s;}
+    .dev-card:hover{border-color:rgba(255,215,0,0.3);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(255,215,0,0.08);}
+    .dev-card:hover::before{opacity:1;}
+
+    .dev-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,215,0,0.25);}
+    .dev-avatar-placeholder{width:52px;height:52px;border-radius:50%;border:2px solid rgba(255,215,0,0.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;flex-shrink:0;}
+    .online-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid #000;box-shadow:0 0 6px rgba(34,197,94,0.6);position:absolute;bottom:0;right:0;}
+
+    .dev-skill-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:0.65rem;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;border:1px solid;flex-shrink:0;}
+
+    .stars-row{display:flex;align-items:center;gap:2px;}
+    .stars-row iconify-icon{font-size:12px;color:#FFD700;}
+    .stars-row iconify-icon.empty{color:rgba(255,255,255,0.15);}
+
+    .stat-mini{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);flex:1;min-width:0;}
+    .stat-mini-val{font-size:0.95rem;font-weight:800;color:#fff;}
+    .stat-mini-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.3);}
+
+    .connect-btn{
+      width:100%;display:flex;align-items:center;justify-content:center;gap:7px;
+      padding:10px;border-radius:12px;border:none;cursor:pointer;font-weight:700;
+      font-size:0.8rem;font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.08));
+      color:#FFD700;border:1px solid rgba(255,215,0,0.25);transition:all 0.25s;
+    }
+    .connect-btn:hover{background:linear-gradient(135deg,rgba(255,215,0,0.25),rgba(255,215,0,0.12));box-shadow:0 0 16px rgba(255,215,0,0.2);transform:translateY(-1px);}
+
+    /* ===== IN-FLOW BADGE ===== */
+    .in-flow-badge{
+      display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;
+      background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);
+      font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#FFD700;
+    }
+
+    /* ===== SEARCH & TOOLBAR ===== */
+    .search-bar{
+      display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 14px;
+      transition:border-color 0.2s;
+    }
+    .search-bar:focus-within{border-color:rgba(255,215,0,0.3);}
+    .search-bar input{background:transparent;border:none;outline:none;color:#fff;font-size:0.85rem;width:100%;font-family:'Inter',sans-serif;}
+    .search-bar input::placeholder{color:rgba(255,255,255,0.3);}
+
+    .sort-select{
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      color:rgba(255,255,255,0.6);border-radius:10px;padding:9px 12px;font-size:0.8rem;
+      outline:none;cursor:pointer;font-family:'Inter',sans-serif;
+    }
+    .sort-select:focus{border-color:rgba(255,215,0,0.3);}
+    .sort-select option{background:#111;}
+
+    /* ===== RESULT COUNT ===== */
+    .result-info{font-size:0.78rem;color:rgba(255,255,255,0.3);}
+    .result-info strong{color:rgba(255,255,255,0.7);}
+
+    /* ===== ACTIVE FILTER CHIPS ===== */
+    .active-filters{display:flex;flex-wrap:wrap;gap:6px;}
+    .af-chip{
+      display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;
+      background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);
+      font-size:0.7rem;font-weight:600;color:#FFD700;cursor:pointer;transition:all 0.2s;
+    }
+    .af-chip:hover{background:rgba(255,0,0,0.08);border-color:rgba(255,0,0,0.2);color:#ff6b6b;}
+    .af-chip iconify-icon{font-size:11px;}
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.3);}
+    .empty-state iconify-icon{font-size:48px;opacity:0.2;margin-bottom:16px;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .fade-up{animation:fadeUp 0.4s ease forwards;}
+
+    /* Glow divider */
+    .gold-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.25),transparent);}
+
+    @media(max-width:1100px){
+      .filter-panel{width:240px;}
+      .profile-panel{width:260px;}
+    }
+    @media(max-width:860px){
+      .page-layout{flex-direction:column !important;}
+      .filter-panel,.profile-panel{width:100%;position:static;max-height:none;}
+      .profile-panel{order:3;}
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+
+<!-- SOCIAL SIDEBAR -->
+<aside class="social-sidebar" aria-label="Sosyal medya">
+  <a href="#" class="social-btn" aria-label="Discord"><iconify-icon icon="ic:baseline-discord"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="GitHub"><iconify-icon icon="mdi:github"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="Twitter X"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="Instagram"><iconify-icon icon="mdi:instagram"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="YouTube"><iconify-icon icon="mdi:youtube"></iconify-icon></a>
+</aside>
+
+<!-- HEADER -->
+<header class="site-header" id="site-header">
+  <nav class="navbar-inner" role="navigation" aria-label="Ana gezinme">
+    <a href="index.html" class="nav-logo" aria-label="Lumos">
+      <img src="assets/icon/lumosy.png" alt="Lumos" onerror="this.style.display='none'">
+      LUMOS
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link"><iconify-icon icon="solar:home-bold"></iconify-icon>Anasayfa</a>
+      <a href="forum.html" class="nav-link"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>Forumlar</a>
+      <a href="devs-matching.html" class="nav-link active"><iconify-icon icon="solar:users-group-two-rounded-bold"></iconify-icon>Dev Match</a>
+      <a href="#" class="nav-link"><iconify-icon icon="solar:cpu-bolt-bold"></iconify-icon>AI Portfoy</a>
+      <a href="#" class="nav-link"><iconify-icon icon="solar:document-text-bold"></iconify-icon>Dokumanlar</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-cta-cluster">
+        <a href="#" class="nav-notif-link">
+          <iconify-icon icon="solar:bell-bold" style="font-size:16px;"></iconify-icon>
+          <span class="notif-label" style="font-size:14px;">Bildirimler</span>
+          <span class="notif-dot"></span>
+        </a>
+        <a href="#" class="nav-cta-btn">
+          <iconify-icon icon="mdi:account" style="font-size:16px;"></iconify-icon>
+          <span>Profil</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div style="height:88px;"></div>
+
+<!-- PAGE HERO -->
+<section style="position:relative;z-index:3;padding:40px 32px 28px;max-width:1200px;margin:0 auto;">
+  <div style="display:inline-flex;align-items:center;gap:8px;padding:4px 14px;border-radius:999px;border:1px solid rgba(255,215,0,0.2);background:rgba(255,215,0,0.05);margin-bottom:16px;">
+    <span style="width:6px;height:6px;border-radius:50%;background:#FFD700;box-shadow:0 0 8px rgba(255,215,0,0.8);animation:pgold 2s ease-in-out infinite;"></span>
+    <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,215,0,0.8);">1,247 Geliştirici Akışta</span>
+  </div>
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+    <div>
+      <h1 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;letter-spacing:-0.03em;line-height:1.1;margin-bottom:8px;">
+        <span style="color:#fff;">Geliştirici</span> <span class="gold-shimmer">Eşleştirme</span>
+      </h1>
+      <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;line-height:1.6;max-width:520px;">
+        Kriterlere göre geliştiricileri filtrele, bul ve bağlan. Akışa katılarak seni arayan ekiplerle eşleş.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);font-size:0.78rem;color:rgba(255,255,255,0.5);">
+        <iconify-icon icon="solar:users-group-rounded-bold" style="font-size:15px;color:#FFD700;"></iconify-icon>
+        <strong style="color:#fff;">8,432</strong> üye
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);font-size:0.78rem;color:rgba(255,255,255,0.5);">
+        <iconify-icon icon="solar:hand-shake-bold" style="font-size:15px;color:#FFD700;"></iconify-icon>
+        <strong style="color:#fff;">3,120</strong> eşleşme
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<main style="position:relative;z-index:3;max-width:1200px;margin:0 auto;padding:0 32px 60px;">
+  <div class="page-layout" style="display:flex;gap:20px;align-items:flex-start;">
+
+    <!-- ════════════════════════════════════════
+         LEFT: FILTER PANEL
+    ════════════════════════════════════════ -->
+    <aside class="filter-panel" id="filter-panel">
+
+      <!-- SECTION: Kategori -->
+      <div>
+        <p class="filter-section-title">Kategori</p>
+        <div class="cat-tabs">
+          <button class="cat-tab active" data-cat="all" onclick="selectCat('all',this)">
+            <iconify-icon icon="solar:star-bold"></iconify-icon>
+            Tümü
+            <span class="cat-count">247</span>
+          </button>
+          <button class="cat-tab" data-cat="backend" onclick="selectCat('backend',this)">
+            <iconify-icon icon="solar:server-bold"></iconify-icon>
+            Backend
+            <span class="cat-count">89</span>
+          </button>
+          <button class="cat-tab" data-cat="frontend" onclick="selectCat('frontend',this)">
+            <iconify-icon icon="solar:monitor-bold"></iconify-icon>
+            Frontend
+            <span class="cat-count">74</span>
+          </button>
+          <button class="cat-tab" data-cat="fullstack" onclick="selectCat('fullstack',this)">
+            <iconify-icon icon="solar:layers-bold"></iconify-icon>
+            Fullstack
+            <span class="cat-count">53</span>
+          </button>
+          <button class="cat-tab" data-cat="database" onclick="selectCat('database',this)">
+            <iconify-icon icon="solar:database-bold"></iconify-icon>
+            Database / SQL
+            <span class="cat-count">31</span>
+          </button>
+          <button class="cat-tab" data-cat="ai" onclick="selectCat('ai',this)">
+            <iconify-icon icon="solar:cpu-bolt-bold"></iconify-icon>
+            AI / ML
+            <span class="cat-count">28</span>
+          </button>
+          <button class="cat-tab" data-cat="new" onclick="selectCat('new',this)">
+            <iconify-icon icon="solar:magic-stick-bold"></iconify-icon>
+            Yeni Nesil
+            <span class="cat-count">22</span>
+          </button>
+          <button class="cat-tab" data-cat="mobile" onclick="selectCat('mobile',this)">
+            <iconify-icon icon="solar:smartphone-bold"></iconify-icon>
+            Mobile
+            <span class="cat-count">18</span>
+          </button>
+          <button class="cat-tab" data-cat="devops" onclick="selectCat('devops',this)">
+            <iconify-icon icon="solar:settings-bold"></iconify-icon>
+            DevOps
+            <span class="cat-count">14</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="gold-divider"></div>
+
+      <!-- SECTION: Dil/Teknoloji -->
+      <div>
+        <p class="filter-section-title">Dil & Teknoloji</p>
+
+        <!-- Backend Skills -->
+        <div class="skill-group visible" id="sg-backend">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Backend</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#f89820;"></span>Java</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#3776AB;"></span>Python</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#00ADD8;"></span>Go (Golang)</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#CC342D;"></span>Ruby on Rails</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#239120;"></span>PHP / Laravel</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#CC6699;"></span>C# / .NET</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FF6600;"></span>Rust</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#68A063;"></span>Node.js</label></label>
+        </div>
+
+        <!-- Frontend Skills -->
+        <div class="skill-group" id="sg-frontend">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Frontend</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#61DAFB;"></span>React</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#42B883;"></span>Vue.js</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#DD0031;"></span>Angular</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FF4154;"></span>Svelte</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#1572B6;"></span>CSS / Tailwind</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#F7DF1E;"></span>JavaScript</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#3178C6;"></span>TypeScript</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#000;border:1px solid #fff;"></span>Next.js</label></label>
+        </div>
+
+        <!-- Fullstack -->
+        <div class="skill-group" id="sg-fullstack">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Fullstack</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#000;border:1px solid #fff;"></span>Next.js</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#38BDF8;"></span>Nuxt.js</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#E44D26;"></span>MERN Stack</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FF6B35;"></span>Remix</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FFD700;"></span>T3 Stack</label></label>
+        </div>
+
+        <!-- Database -->
+        <div class="skill-group" id="sg-database">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Database / SQL</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#4479A1;"></span>MySQL</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#336791;"></span>PostgreSQL</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#47A248;"></span>MongoDB</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#DC382D;"></span>Redis</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#003B57;"></span>SQLite</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#F05032;"></span>Firebase</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#00A3E0;"></span>Supabase</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#005C99;"></span>Microsoft SQL</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#E25A1C;"></span>Cassandra</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#005F73;"></span>Elasticsearch</label></label>
+        </div>
+
+        <!-- AI/ML -->
+        <div class="skill-group" id="sg-ai">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">AI / ML</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#3776AB;"></span>Python / TensorFlow</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#EE4C2C;"></span>PyTorch</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FF6B35;"></span>Hugging Face</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#00A67E;"></span>LangChain</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FFD700;"></span>Fine-tuning LLM</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#7B2FBE;"></span>RAG / Vector DB</label></label>
+        </div>
+
+        <!-- Yeni Nesil -->
+        <div class="skill-group" id="sg-new">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Yeni Nesil</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FFD700;"></span>Vibe Coder</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#00A67E;"></span>AI Engineer</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#7B2FBE;"></span>Prompt Engineer</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#3178C6;"></span>No-Code / Low-Code</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#F7DF1E;"></span>AI Agent Builder</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FF6B35;"></span>Indie Hacker</label></label>
+        </div>
+
+        <!-- Mobile -->
+        <div class="skill-group" id="sg-mobile">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Mobile</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#61DAFB;"></span>React Native</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#54C5F8;"></span>Flutter / Dart</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#F05138;"></span>Swift / iOS</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#3DDC84;"></span>Kotlin / Android</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#0175C2;"></span>Ionic</label></label>
+        </div>
+
+        <!-- DevOps -->
+        <div class="skill-group" id="sg-devops">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">DevOps</p>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#2496ED;"></span>Docker</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#326CE5;"></span>Kubernetes</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FF9900;"></span>AWS</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#0089D6;"></span>Azure</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#4285F4;"></span>GCP</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#FC6D26;"></span>CI/CD / GitLab</label></label>
+          <label class="skill-check"><input type="checkbox" onchange="updateFilters()"><label><span class="skill-lang-dot" style="background:#7B3F9E;"></span>Terraform</label></label>
+        </div>
+      </div>
+
+      <div class="gold-divider"></div>
+
+      <!-- SECTION: Deneyim Yılı -->
+      <div>
+        <p class="filter-section-title">Minimum Deneyim</p>
+        <div class="slider-wrap">
+          <div class="slider-label">
+            <span>Yıl</span>
+            <span class="slider-val" id="exp-val">0+ yıl</span>
+          </div>
+          <input type="range" id="exp-range" min="0" max="15" value="0" oninput="updateSlider('exp-range','exp-val',v=>v+'+ yıl');updateFilters()">
+        </div>
+      </div>
+
+      <!-- SECTION: Min. Proje -->
+      <div>
+        <p class="filter-section-title">Minimum Proje Sayısı</p>
+        <div class="slider-wrap">
+          <div class="slider-label">
+            <span>Proje</span>
+            <span class="slider-val" id="proj-val">0+ proje</span>
+          </div>
+          <input type="range" id="proj-range" min="0" max="20" value="0" oninput="updateSlider('proj-range','proj-val',v=>v+'+ proje');updateFilters()">
+        </div>
+      </div>
+
+      <div class="gold-divider"></div>
+
+      <!-- SECTION: Minimum Puan/Yıldız -->
+      <div>
+        <p class="filter-section-title">Minimum Yıldız / Puan</p>
+        <div class="star-filter" id="star-filter">
+          <button class="star-opt active" data-stars="0" onclick="selectStars(0,this)">Hepsi</button>
+          <button class="star-opt" data-stars="1" onclick="selectStars(1,this)">
+            <iconify-icon icon="solar:star-bold"></iconify-icon>1+
+          </button>
+          <button class="star-opt" data-stars="2" onclick="selectStars(2,this)">
+            <iconify-icon icon="solar:star-bold"></iconify-icon>2+
+          </button>
+          <button class="star-opt" data-stars="3" onclick="selectStars(3,this)">
+            <iconify-icon icon="solar:star-bold"></iconify-icon>3+
+          </button>
+          <button class="star-opt" data-stars="4" onclick="selectStars(4,this)">
+            <iconify-icon icon="solar:star-bold"></iconify-icon>4+
+          </button>
+        </div>
+      </div>
+
+      <div class="gold-divider"></div>
+
+      <!-- Reset -->
+      <button onclick="resetFilters()" style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:9px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,100,100,0.3)';this.style.color='#ff8080'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.4)'">
+        <iconify-icon icon="solar:restart-bold" style="font-size:14px;"></iconify-icon>
+        Filtreleri Temizle
+      </button>
+
+    </aside>
+
+    <!-- ════════════════════════════════════════
+         CENTER: CARDS
+    ════════════════════════════════════════ -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;">
+
+      <!-- TOOLBAR -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="search-bar" style="flex:1;min-width:200px;">
+          <iconify-icon icon="solar:magnifer-bold" style="font-size:17px;color:rgba(255,255,255,0.3);flex-shrink:0;"></iconify-icon>
+          <input type="text" id="search-input" placeholder="İsim, teknoloji veya başlık ara..." oninput="updateFilters()">
+        </div>
+        <select class="sort-select" id="sort-select" onchange="updateFilters()">
+          <option value="default">Sırala: Önerilen</option>
+          <option value="stars">En Yüksek Puan</option>
+          <option value="experience">En Deneyimli</option>
+          <option value="projects">En Çok Proje</option>
+          <option value="online">Çevrimiçi Önce</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <button id="view-grid" onclick="setView('grid')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,215,0,0.3);background:rgba(255,215,0,0.08);color:#FFD700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+            <iconify-icon icon="solar:widget-bold" style="font-size:16px;"></iconify-icon>
+          </button>
+          <button id="view-list" onclick="setView('list')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+            <iconify-icon icon="solar:list-bold" style="font-size:16px;"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- ACTIVE FILTERS -->
+      <div class="active-filters" id="active-filters"></div>
+
+      <!-- RESULT COUNT -->
+      <div class="result-info" id="result-info"><strong id="result-count">12</strong> geliştirici bulundu</div>
+
+      <!-- CARDS -->
+      <div class="dev-grid" id="dev-grid">
+        <!-- Cards injected by JS -->
+      </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════════
+         RIGHT: PROFILE / AKIŞ PANELİ
+    ════════════════════════════════════════ -->
+    <aside class="profile-panel" id="profile-panel">
+
+      <!-- Flow Toggle -->
+      <div>
+        <p class="filter-section-title" style="margin-bottom:12px;">Akışa Katıl</p>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Akışta Görün</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:3px;">Diğerleri seni bulabilir</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="flow-toggle" onchange="toggleFlow()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="flow-status" id="flow-status" style="margin-top:12px;">
+          <span class="flow-dot"></span>
+          <span id="flow-status-text">Akışın dışındasın — kimse seni göremez</span>
+        </div>
+      </div>
+
+      <div class="gold-divider"></div>
+
+      <!-- Profile Skills (sadece toggle açıksa aktif) -->
+      <div id="my-skills-section" style="opacity:0.3;pointer-events:none;transition:opacity 0.3s;">
+        <p class="filter-section-title" style="margin-bottom:10px;">Profilim — Becerilerim</p>
+        <p style="font-size:0.73rem;color:rgba(255,255,255,0.35);margin-bottom:10px;line-height:1.5;">Sahip olduğun teknolojileri seç. Akışta bu becerilerle görünürsün.</p>
+
+        <!-- My Category -->
+        <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Ben bir...</p>
+        <div class="profile-skill-area" style="margin-bottom:12px;" id="my-role-chips">
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:server-bold"></iconify-icon>Backend Dev</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:monitor-bold"></iconify-icon>Frontend Dev</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:layers-bold"></iconify-icon>Fullstack Dev</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:cpu-bolt-bold"></iconify-icon>AI Engineer</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:magic-stick-bold"></iconify-icon>Vibe Coder</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:star-bold"></iconify-icon>Prompt Eng.</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:smartphone-bold"></iconify-icon>Mobile Dev</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:settings-bold"></iconify-icon>DevOps</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:database-bold"></iconify-icon>DB / SQL Uzmanı</span>
+          <span class="p-chip" onclick="toggleChip(this)"><iconify-icon icon="solar:fire-bold"></iconify-icon>Indie Hacker</span>
+        </div>
+
+        <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Bildiğim Teknolojiler</p>
+        <div class="profile-skill-area" id="my-tech-chips">
+          <!-- Backend -->
+          <span class="p-chip" onclick="toggleChip(this)" style="--dot:#f89820;">Java</span>
+          <span class="p-chip" onclick="toggleChip(this)">Python</span>
+          <span class="p-chip" onclick="toggleChip(this)">Go</span>
+          <span class="p-chip" onclick="toggleChip(this)">Node.js</span>
+          <span class="p-chip" onclick="toggleChip(this)">Rust</span>
+          <span class="p-chip" onclick="toggleChip(this)">PHP</span>
+          <!-- Frontend -->
+          <span class="p-chip" onclick="toggleChip(this)">React</span>
+          <span class="p-chip" onclick="toggleChip(this)">Vue.js</span>
+          <span class="p-chip" onclick="toggleChip(this)">Angular</span>
+          <span class="p-chip" onclick="toggleChip(this)">Next.js</span>
+          <span class="p-chip" onclick="toggleChip(this)">TypeScript</span>
+          <span class="p-chip" onclick="toggleChip(this)">Tailwind</span>
+          <span class="p-chip" onclick="toggleChip(this)">Svelte</span>
+          <!-- DB -->
+          <span class="p-chip" onclick="toggleChip(this)">PostgreSQL</span>
+          <span class="p-chip" onclick="toggleChip(this)">MySQL</span>
+          <span class="p-chip" onclick="toggleChip(this)">MongoDB</span>
+          <span class="p-chip" onclick="toggleChip(this)">Redis</span>
+          <span class="p-chip" onclick="toggleChip(this)">Firebase</span>
+          <span class="p-chip" onclick="toggleChip(this)">Supabase</span>
+          <!-- Mobile -->
+          <span class="p-chip" onclick="toggleChip(this)">React Native</span>
+          <span class="p-chip" onclick="toggleChip(this)">Flutter</span>
+          <span class="p-chip" onclick="toggleChip(this)">Swift</span>
+          <span class="p-chip" onclick="toggleChip(this)">Kotlin</span>
+          <!-- AI -->
+          <span class="p-chip" onclick="toggleChip(this)">TensorFlow</span>
+          <span class="p-chip" onclick="toggleChip(this)">PyTorch</span>
+          <span class="p-chip" onclick="toggleChip(this)">LangChain</span>
+          <span class="p-chip" onclick="toggleChip(this)">RAG</span>
+          <!-- DevOps -->
+          <span class="p-chip" onclick="toggleChip(this)">Docker</span>
+          <span class="p-chip" onclick="toggleChip(this)">Kubernetes</span>
+          <span class="p-chip" onclick="toggleChip(this)">AWS</span>
+          <span class="p-chip" onclick="toggleChip(this)">GCP</span>
+          <span class="p-chip" onclick="toggleChip(this)">Terraform</span>
+        </div>
+
+        <div class="gold-divider" style="margin-top:14px;"></div>
+
+        <!-- My stats -->
+        <p style="font-size:0.68rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.07em;margin:12px 0 8px;">Profilim Hakkında</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="slider-wrap">
+            <div class="slider-label">
+              <span style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Deneyim</span>
+              <span class="slider-val" id="my-exp-val">3 yıl</span>
+            </div>
+            <input type="range" id="my-exp-range" min="0" max="20" value="3" oninput="updateSlider('my-exp-range','my-exp-val',v=>v+' yıl')">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-label">
+              <span style="font-size:0.75rem;color:rgba(255,255,255,0.5);">Proje Sayısı</span>
+              <span class="slider-val" id="my-proj-val">5 proje</span>
+            </div>
+            <input type="range" id="my-proj-range" min="0" max="50" value="5" oninput="updateSlider('my-proj-range','my-proj-val',v=>v+' proje')">
+          </div>
+        </div>
+
+        <button onclick="saveProfile()" style="margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border-radius:12px;background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.08));border:1px solid rgba(255,215,0,0.25);color:#FFD700;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.25s;" onmouseover="this.style.boxShadow='0 0 16px rgba(255,215,0,0.2)'" onmouseout="this.style.boxShadow=''">
+          <iconify-icon icon="solar:check-circle-bold" style="font-size:16px;"></iconify-icon>
+          Profili Kaydet
+        </button>
+      </div>
+
+    </aside>
+
+  </div>
+</main>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer style="background:#000;border-top:1px solid rgba(255,255,255,0.07);padding:40px 32px;position:relative;z-index:3;text-align:center;">
+  <p style="font-size:0.8rem;color:rgba(255,255,255,0.2);">&copy; 2026 Lumos Developer Universe. Tüm hakları saklıdır.</p>
+</footer>
+
+<!-- ========= SCRIPTS ========= -->
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  MOCK DATA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const devs = [
+  {id:1,name:"Ahmet Yılmaz",title:"Senior Backend Developer",avatar:null,initials:"AY",color:"#f89820",cat:"backend",skills:["Java","Spring Boot","Docker","PostgreSQL"],experience:7,projects:14,stars:4.8,online:true,inFlow:true,points:2340},
+  {id:2,name:"Elif Kaya",title:"Frontend / React Specialist",avatar:null,initials:"EK",color:"#61DAFB",cat:"frontend",skills:["React","TypeScript","Next.js","Tailwind"],experience:4,projects:9,stars:4.5,online:true,inFlow:true,points:1870},
+  {id:3,name:"Mert Demir",title:"AI Engineer & ML Researcher",avatar:null,initials:"MD",color:"#7B2FBE",cat:"ai",skills:["Python","PyTorch","LangChain","RAG"],experience:5,projects:11,stars:4.7,online:false,inFlow:false,points:2100},
+  {id:4,name:"Selin Arslan",title:"Fullstack Developer",avatar:null,initials:"SA",color:"#FF6B35",cat:"fullstack",skills:["Next.js","Node.js","MongoDB","TypeScript"],experience:3,projects:7,stars:4.2,online:true,inFlow:true,points:1540},
+  {id:5,name:"Burak Çelik",title:"Vibe Coder / Indie Hacker",avatar:null,initials:"BC",color:"#FFD700",cat:"new",skills:["Vibe Coding","React","Supabase","AI Agent"],experience:2,projects:12,stars:4.0,online:true,inFlow:true,points:980},
+  {id:6,name:"Zeynep Öz",title:"Database Architect",avatar:null,initials:"ZÖ",color:"#4479A1",cat:"database",skills:["MySQL","PostgreSQL","Redis","Elasticsearch"],experience:8,projects:6,stars:4.9,online:false,inFlow:false,points:2780},
+  {id:7,name:"Can Şahin",title:"DevOps & Cloud Engineer",avatar:null,initials:"CŞ",color:"#2496ED",cat:"devops",skills:["Docker","Kubernetes","AWS","Terraform"],experience:6,projects:8,stars:4.6,online:true,inFlow:false,points:2050},
+  {id:8,name:"Ayşe Bal",title:"Mobile Developer (Flutter)",avatar:null,initials:"AB",color:"#54C5F8",cat:"mobile",skills:["Flutter","Dart","Firebase","Swift"],experience:4,projects:10,stars:4.3,online:true,inFlow:true,points:1690},
+  {id:9,name:"Oğuzhan Yurt",title:"Prompt Engineer",avatar:null,initials:"OY",color:"#00A67E",cat:"new",skills:["Prompt Engineering","GPT-4","LangChain","Fine-tuning"],experience:2,projects:5,stars:3.9,online:false,inFlow:false,points:760},
+  {id:10,name:"Fatma Koç",title:"Python Backend & API",avatar:null,initials:"FK",color:"#3776AB",cat:"backend",skills:["Python","FastAPI","PostgreSQL","Redis"],experience:5,projects:9,stars:4.4,online:true,inFlow:true,points:1920},
+  {id:11,name:"Tarık Uzun",title:"React Native Mobile Dev",avatar:null,initials:"TU",color:"#3DDC84",cat:"mobile",skills:["React Native","TypeScript","Firebase","Expo"],experience:3,projects:6,stars:4.1,online:false,inFlow:false,points:1210},
+  {id:12,name:"Nisan Aydın",title:"AI Agent Builder",avatar:null,initials:"NA",color:"#FF4154",cat:"new",skills:["AI Agents","LangChain","Python","Vector DB"],experience:1,projects:4,stars:3.7,online:true,inFlow:true,points:540},
+];
+
+let activeStars = 0;
+let activeCat = "all";
+let currentView = "grid";
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  RENDER CARDS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderCards(list) {
+  const grid = document.getElementById('dev-grid');
+  if(!list.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <iconify-icon icon="solar:users-group-rounded-bold"></iconify-icon>
+      <p style="font-size:1rem;font-weight:600;margin-bottom:6px;">Geliştirici bulunamadı</p>
+      <p style="font-size:0.8rem;">Filtrelerini biraz genişlet.</p>
+    </div>`;
+    document.getElementById('result-count').textContent = '0';
+    return;
+  }
+  document.getElementById('result-count').textContent = list.length;
+
+  grid.innerHTML = list.map((d,i) => {
+    const starsHTML = [1,2,3,4,5].map(s => s <= Math.round(d.stars)
+      ? `<iconify-icon icon="solar:star-bold"></iconify-icon>`
+      : `<iconify-icon icon="solar:star-bold" class="empty"></iconify-icon>`).join('');
+
+    const skillChips = d.skills.slice(0,3).map(sk =>
+      `<span class="dev-skill-chip" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.06);color:rgba(255,215,0,0.8);">${sk}</span>`
+    ).join('') + (d.skills.length > 3 ? `<span class="dev-skill-chip" style="border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);">+${d.skills.length-3}</span>` : '');
+
+    return `<div class="dev-card fade-up" style="animation-delay:${i*0.04}s;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:11px;">
+          <div style="position:relative;">
+            <div class="dev-avatar-placeholder" style="background:${d.color}18;border-color:${d.color}44;color:${d.color};">${d.initials}</div>
+            ${d.online ? '<span class="online-dot"></span>' : ''}
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:0.9rem;line-height:1.3;">${d.name}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.4;">${d.title}</div>
+          </div>
+        </div>
+        ${d.inFlow ? '<span class="in-flow-badge"><iconify-icon icon="solar:bolt-bold" style="font-size:11px;"></iconify-icon>Akışta</span>' : ''}
+      </div>
+
+      <!-- Stars & Points -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="stars-row">${starsHTML} <span style="font-size:0.75rem;color:rgba(255,255,255,0.5);margin-left:5px;">${d.stars}</span></div>
+        <div style="font-size:0.72rem;color:rgba(255,215,0,0.7);font-weight:700;"><iconify-icon icon="solar:medal-ribbon-bold" style="font-size:12px;vertical-align:middle;"></iconify-icon> ${d.points.toLocaleString()} pts</div>
+      </div>
+
+      <!-- Skill chips -->
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">${skillChips}</div>
+
+      <!-- Stats -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <div class="stat-mini">
+          <span class="stat-mini-val">${d.experience}</span>
+          <span class="stat-mini-label">Yıl Deneyim</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-mini-val">${d.projects}</span>
+          <span class="stat-mini-label">Proje</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-mini-val" style="color:#FFD700;">${d.stars}</span>
+          <span class="stat-mini-label">Yıldız</span>
+        </div>
+      </div>
+
+      <button class="connect-btn" onclick="connectDev(${d.id})">
+        <iconify-icon icon="solar:hand-shake-bold" style="font-size:16px;"></iconify-icon>
+        Bağlantı Kur
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  FILTER LOGIC
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updateFilters() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const minExp = parseInt(document.getElementById('exp-range').value);
+  const minProj = parseInt(document.getElementById('proj-range').value);
+  const sort = document.getElementById('sort-select').value;
+
+  let result = devs.filter(d => {
+    if(activeCat !== "all" && d.cat !== activeCat) return false;
+    if(d.experience < minExp) return false;
+    if(d.projects < minProj) return false;
+    if(d.stars < activeStars) return false;
+    if(search && !d.name.toLowerCase().includes(search) && !d.title.toLowerCase().includes(search) && !d.skills.some(s=>s.toLowerCase().includes(search))) return false;
+    return true;
+  });
+
+  if(sort==="stars") result.sort((a,b)=>b.stars-a.stars);
+  else if(sort==="experience") result.sort((a,b)=>b.experience-a.experience);
+  else if(sort==="projects") result.sort((a,b)=>b.projects-a.projects);
+  else if(sort==="online") result.sort((a,b)=>(b.online?1:0)-(a.online?1:0));
+
+  renderCards(result);
+  renderActiveFilters(minExp, minProj);
+}
+
+function renderActiveFilters(minExp, minProj) {
+  const container = document.getElementById('active-filters');
+  const chips = [];
+  if(activeCat !== "all") chips.push({label: 'Kategori: '+activeCat, action: "selectCat('all',document.querySelector('.cat-tab[data-cat=all]'))"});
+  if(minExp > 0) chips.push({label: minExp+'+ yıl deneyim', action: "document.getElementById('exp-range').value=0;updateSlider('exp-range','exp-val',v=>v+'+ yıl');updateFilters()"});
+  if(minProj > 0) chips.push({label: minProj+'+ proje', action: "document.getElementById('proj-range').value=0;updateSlider('proj-range','proj-val',v=>v+'+ proje');updateFilters()"});
+  if(activeStars > 0) chips.push({label: activeStars+'+ yıldız', action: "selectStars(0,document.querySelector('.star-opt[data-stars=\\'0\\''))"});
+
+  container.innerHTML = chips.map(c =>
+    `<span class="af-chip" onclick="${c.action}">${c.label} <iconify-icon icon="solar:close-circle-bold"></iconify-icon></span>`
+  ).join('');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CATEGORY SELECTOR
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const catSkillMap = {
+  all: ['backend','frontend','fullstack','database','ai','new','mobile','devops'],
+  backend: ['backend'],
+  frontend: ['frontend'],
+  fullstack: ['fullstack'],
+  database: ['database'],
+  ai: ['ai'],
+  new: ['new'],
+  mobile: ['mobile'],
+  devops: ['devops'],
+};
+
+function selectCat(cat, el) {
+  activeCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  // Show relevant skill groups
+  const toShow = cat === 'all' ? ['backend','frontend','fullstack','database','ai','new','mobile','devops'] : [cat];
+  document.querySelectorAll('.skill-group').forEach(sg => {
+    const id = sg.id.replace('sg-','');
+    sg.classList.toggle('visible', toShow.includes(id));
+  });
+  updateFilters();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  STAR SELECTOR
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function selectStars(val, el) {
+  activeStars = val;
+  document.querySelectorAll('.star-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  updateFilters();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  SLIDER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updateSlider(rangeId, valId, fmt) {
+  const val = document.getElementById(rangeId).value;
+  document.getElementById(valId).textContent = fmt(val);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  RESET FILTERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function resetFilters() {
+  document.getElementById('exp-range').value = 0;
+  document.getElementById('exp-val').textContent = '0+ yıl';
+  document.getElementById('proj-range').value = 0;
+  document.getElementById('proj-val').textContent = '0+ proje';
+  document.getElementById('search-input').value = '';
+  document.getElementById('sort-select').value = 'default';
+  selectCat('all', document.querySelector('.cat-tab[data-cat="all"]'));
+  selectStars(0, document.querySelector('.star-opt[data-stars="0"]'));
+  document.querySelectorAll('.skill-check input[type="checkbox"]').forEach(cb => cb.checked = false);
+  updateFilters();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  VIEW TOGGLE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function setView(v) {
+  currentView = v;
+  const grid = document.getElementById('dev-grid');
+  const btnGrid = document.getElementById('view-grid');
+  const btnList = document.getElementById('view-list');
+  if(v === 'grid') {
+    grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(280px,1fr))';
+    btnGrid.style.borderColor = 'rgba(255,215,0,0.3)';
+    btnGrid.style.background = 'rgba(255,215,0,0.08)';
+    btnGrid.style.color = '#FFD700';
+    btnList.style.borderColor = 'rgba(255,255,255,0.1)';
+    btnList.style.background = 'transparent';
+    btnList.style.color = 'rgba(255,255,255,0.4)';
+  } else {
+    grid.style.gridTemplateColumns = '1fr';
+    btnList.style.borderColor = 'rgba(255,215,0,0.3)';
+    btnList.style.background = 'rgba(255,215,0,0.08)';
+    btnList.style.color = '#FFD700';
+    btnGrid.style.borderColor = 'rgba(255,255,255,0.1)';
+    btnGrid.style.background = 'transparent';
+    btnGrid.style.color = 'rgba(255,255,255,0.4)';
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  FLOW TOGGLE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleFlow() {
+  const on = document.getElementById('flow-toggle').checked;
+  const status = document.getElementById('flow-status');
+  const txt = document.getElementById('flow-status-text');
+  const mySkills = document.getElementById('my-skills-section');
+  if(on) {
+    status.classList.add('active-flow');
+    txt.textContent = 'Akışta görünüyorsun — başkaları seni bulabilir!';
+    mySkills.style.opacity = '1';
+    mySkills.style.pointerEvents = 'auto';
+  } else {
+    status.classList.remove('active-flow');
+    txt.textContent = 'Akışın dışındasın — kimse seni göremez';
+    mySkills.style.opacity = '0.3';
+    mySkills.style.pointerEvents = 'none';
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  PROFILE CHIPS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+function saveProfile() {
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<iconify-icon icon="solar:check-circle-bold" style="font-size:16px;"></iconify-icon> Kaydedildi!';
+  btn.style.background = 'linear-gradient(135deg,rgba(34,197,94,0.2),rgba(34,197,94,0.1))';
+  btn.style.borderColor = 'rgba(34,197,94,0.3)';
+  btn.style.color = '#4ade80';
+  setTimeout(() => {
+    btn.innerHTML = orig;
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }, 2000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CONNECT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function connectDev(id) {
+  const dev = devs.find(d => d.id === id);
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(10,10,15,0.95);border:1px solid rgba(255,215,0,0.3);backdrop-filter:blur(20px);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:0.82rem;color:rgba(255,255,255,0.8);transform:translateY(80px);opacity:0;transition:all 0.4s cubic-bezier(.22,1,.36,1);pointer-events:none;';
+  toast.innerHTML = `<iconify-icon icon="solar:hand-shake-bold" style="font-size:20px;color:#FFD700;"></iconify-icon><span>Bağlantı isteği <strong>${dev.name}</strong>'e gönderildi!</span>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; });
+  setTimeout(() => { toast.style.transform = 'translateY(80px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
+}
+
+// INIT
+renderCards(devs);
+</script>
+
+<!-- BG PARTICLES -->
+<script>
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',()=>{resize();spawn();});
+  const r=(a,b)=>a+Math.random()*(b-a);
+  const N=60; let P=[];
+  function mk(){return{x:r(0,c.width),y:r(-20,c.height+20),size:r(1.2,3.5),vy:r(.12,.5),vx:r(-.1,.1),alpha:r(.05,.5),aT:r(.05,.6),aS:r(.006,.02),gP:r(0,Math.PI*2),gS:r(.01,.04),gold:Math.random()>.5};}
+  function spawn(){P=[];for(let i=0;i<N;i++)P.push(mk());}
+  spawn();
+  function draw(p){
+    const g=.5+.5*Math.sin(p.gP),gr=p.size*(2+g*2.5);
+    const gd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,gr);
+    if(p.gold){gd.addColorStop(0,'rgba(255,215,0,'+p.alpha*.7+')');gd.addColorStop(.4,'rgba(255,185,0,'+p.alpha*.25+')');gd.addColorStop(1,'rgba(255,215,0,0)');}
+    else{gd.addColorStop(0,'rgba(112,41,188,'+p.alpha*.7+')');gd.addColorStop(.4,'rgba(150,80,220,'+p.alpha*.25+')');gd.addColorStop(1,'rgba(112,41,188,0)');}
+    ctx.beginPath();ctx.arc(p.x,p.y,gr,0,Math.PI*2);ctx.fillStyle=gd;ctx.fill();
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size*.5,0,Math.PI*2);
+    ctx.fillStyle=p.gold?'rgba(255,230,80,'+p.alpha+')':'rgba(160,100,230,'+p.alpha+')';ctx.fill();
+  }
+  function tick(){
+    ctx.clearRect(0,0,c.width,c.height);
+    for(const p of P){
+      p.x+=p.vx;p.y+=p.vy;p.vx+=r(-.002,.002);p.vx=Math.max(-.25,Math.min(.25,p.vx));
+      if(Math.abs(p.alpha-p.aT)<.01)p.aT=r(.05,.6);
+      p.alpha=p.alpha<p.aT?Math.min(p.aT,p.alpha+p.aS):Math.max(p.aT,p.alpha-p.aS);
+      p.gP+=p.gS;
+      if(p.y>c.height+20||p.x<-30||p.x>c.width+30)Object.assign(p,mk());
+      draw(p);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+</body>
+</html>
+

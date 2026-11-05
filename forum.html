@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lumos &mdash; Forum / Command Center</title>
+  <meta name="description" content="Lumos Forum &mdash; Gelistiricilerin bulusmasi, fikir paylasimi ve elit bilgi merkezi."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:#000;color:#fff;overflow-x:hidden;min-height:100vh;}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-track{background:#000;}
+    ::-webkit-scrollbar-thumb{background:#FFD700;border-radius:999px;}
+
+    /* Gold shimmer text */
+    .gold-shimmer{
+      background:linear-gradient(90deg,#CC9F00 0%,#FFD700 40%,#FFE44D 60%,#CC9F00 100%);
+      background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;animation:shimmer 3s linear infinite;
+    }
+    @keyframes shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+
+    /* ===== NAVBAR ===== */
+    .site-header{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:1200px;z-index:200;}
+    .navbar-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#000;border-radius:26px;padding:8px 10px;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);}
+    .nav-logo{display:flex;align-items:center;justify-content:center;height:44px;padding:0 20px;border-radius:999px;background:#fff;color:#000;font-weight:800;font-size:15px;letter-spacing:-0.03em;text-decoration:none;flex-shrink:0;transition:transform 0.3s ease;gap:8px;}
+    .nav-logo:hover{transform:scale(1.04);}
+    .nav-logo img{width:22px;height:22px;object-fit:contain;border-radius:50%;}
+    .nav-links{display:flex;align-items:center;justify-content:center;gap:2px;}
+    .nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-size:15px;font-weight:500;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.3s ease;letter-spacing:-0.02em;white-space:nowrap;}
+    .nav-link:hover{color:#fff;}
+    .nav-link iconify-icon{font-size:15px;opacity:0.6;flex-shrink:0;}
+    .nav-link.active{color:#FFD700;}
+    .nav-link.active iconify-icon{opacity:1;}
+    .nav-right{display:flex;align-items:center;justify-content:flex-end;}
+    .nav-cta-cluster{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.18);border-radius:999px;padding:3px 3px 3px 10px;}
+    .nav-notif-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.8);font-size:14px;font-weight:500;text-decoration:none;padding:8px 28px 8px 8px;position:relative;transition:opacity 0.2s;}
+    .nav-notif-link:hover{opacity:0.7;}
+    .notif-dot{position:absolute;top:5px;right:10px;width:6px;height:6px;background:#ff3b3b;border-radius:50%;border:1.5px solid #000;}
+    .nav-cta-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#000;font-size:14px;font-weight:600;padding:9px 16px;border-radius:999px;text-decoration:none;transition:all 0.3s ease;}
+    .nav-cta-btn:hover{background:#FFD700;}
+    @media(max-width:900px){.nav-links{display:none;}.notif-label{display:none;}}
+
+    /* ===== SOCIAL SIDEBAR ===== */
+    .social-sidebar{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .social-sidebar::before,.social-sidebar::after{content:"";display:block;width:1px;height:50px;}
+    .social-sidebar::before{background:linear-gradient(to bottom,transparent,rgba(112,41,188,0.4));}
+    .social-sidebar::after{background:linear-gradient(to top,transparent,rgba(112,41,188,0.4));}
+    .social-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);text-decoration:none;transition:all 0.3s ease;font-size:15px;}
+    .social-btn:hover{border-color:rgba(112,41,188,0.6);color:#9B59D4;background:rgba(112,41,188,0.08);transform:scale(1.12);box-shadow:0 0 12px rgba(112,41,188,0.3);}
+    @media(max-width:1100px){.social-sidebar{display:none;}}
+
+    /* ===== TERMINAL CURSOR ===== */
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+    .cursor{display:inline-block;width:8px;height:14px;background:#FFD700;border-radius:1px;animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px;}
+
+    /* ===== CATEGORY BUTTON ===== */
+    .cat-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid transparent;color:rgba(255,255,255,0.55);font-size:0.875rem;font-weight:500;cursor:pointer;transition:all 0.25s ease;text-align:left;}
+    .cat-btn:hover{border-color:#7029bc;color:#fff;background:rgba(112,41,188,0.07);box-shadow:0 0 12px rgba(112,41,188,0.12);}
+    .cat-btn.active{border-color:#7029bc;color:#fff;background:rgba(112,41,188,0.1);}
+    .cat-btn iconify-icon{font-size:16px;flex-shrink:0;opacity:0.65;}
+    .cat-btn.active iconify-icon{opacity:1;color:#a855f7;}
+    .cat-count{margin-left:auto;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);}
+    .cat-btn.active .cat-count{background:rgba(112,41,188,0.2);color:#a855f7;}
+
+    /* ===== FORUM CARD ===== */
+    .forum-card{background:#0a0a0a;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px 22px;transition:all 0.3s ease;cursor:pointer;position:relative;overflow:hidden;}
+    .forum-card::before{content:"";position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(112,41,188,0.06) 0%,transparent 60%);opacity:0;transition:opacity 0.3s ease;}
+    .forum-card:hover{border-color:rgba(112,41,188,0.45);transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.6),0 0 18px rgba(112,41,188,0.12);}
+    .forum-card:hover::before{opacity:1;}
+    .skill-tag{display:inline-flex;align-items:center;padding:2px 9px;border-radius:5px;font-size:0.68rem;font-weight:700;letter-spacing:0.04em;font-family:'JetBrains Mono',monospace;background:rgba(112,41,188,0.12);color:#a855f7;border:1px solid rgba(112,41,188,0.25);}
+    .skill-tag.gold{background:rgba(255,215,0,0.08);color:#FFD700;border-color:rgba(255,215,0,0.2);}
+    .skill-tag.green{background:rgba(34,197,94,0.08);color:#4ade80;border-color:rgba(34,197,94,0.2);}
+    .skill-tag.blue{background:rgba(59,130,246,0.1);color:#60a5fa;border-color:rgba(59,130,246,0.2);}
+    .skill-tag.red{background:rgba(239,68,68,0.08);color:#f87171;border-color:rgba(239,68,68,0.2);}
+    .status-dot-online{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 5px rgba(34,197,94,0.6);flex-shrink:0;}
+    .status-dot-away{width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;}
+    .vote-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.25s ease;color:rgba(255,255,255,0.35);font-size:0.7rem;font-weight:700;}
+    .vote-btn:hover{border-color:rgba(112,41,188,0.5);color:#a855f7;background:rgba(112,41,188,0.08);}
+    .vote-btn.voted{border-color:rgba(255,215,0,0.4);color:#FFD700;background:rgba(255,215,0,0.06);}
+
+    /* ===== LEADERBOARD ===== */
+    .leader-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid transparent;transition:all 0.25s ease;cursor:pointer;}
+    .leader-row:hover{background:rgba(112,41,188,0.05);border-color:rgba(112,41,188,0.25);}
+    .rank-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+    .rank-1{background:linear-gradient(135deg,#FFD700,#CC9F00);color:#000;box-shadow:0 0 10px rgba(255,215,0,0.35);}
+    .rank-2{background:linear-gradient(135deg,#b0b0b0,#707070);color:#fff;}
+    .rank-3{background:linear-gradient(135deg,#cd7f32,#8b4513);color:#fff;}
+    .rank-n{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.35);}
+    .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.8rem;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.1);}
+    .xp-bar-track{width:100%;height:3px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-top:4px;}
+    .xp-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#7029bc,#a855f7);}
+    .xp-bar-fill.gold{background:linear-gradient(90deg,#CC9F00,#FFD700);}
+
+    /* ===== SEARCH BAR ===== */
+    .search-input{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:11px 16px 11px 42px;font-size:0.875rem;color:#fff;font-family:'Inter',sans-serif;outline:none;transition:all 0.25s ease;}
+    .search-input::placeholder{color:rgba(255,255,255,0.25);}
+    .search-input:focus{border-color:rgba(112,41,188,0.5);box-shadow:0 0 0 3px rgba(112,41,188,0.08),0 0 12px rgba(112,41,188,0.1);}
+
+    /* ===== NEW POST BUTTON ===== */
+    .new-post-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:11px;background:#FFD700;color:#000;font-weight:700;font-size:0.875rem;border:none;cursor:pointer;transition:all 0.3s ease;font-family:'Inter',sans-serif;}
+    .new-post-btn:hover{background:#FFE44D;box-shadow:0 0 20px rgba(255,215,0,0.4);transform:translateY(-1px);}
+
+    /* ===== TAG CHIP ===== */
+    .topic-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;border:1px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.07);color:#FFD700;}
+    .topic-tag.purple{border-color:rgba(112,41,188,0.35);background:rgba(112,41,188,0.1);color:#a855f7;}
+    .topic-tag.green{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07);color:#4ade80;}
+    .topic-tag.red{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.07);color:#f87171;}
+
+    /* glow dot */
+    .glow-dot{width:6px;height:6px;border-radius:50%;background:#FFD700;box-shadow:0 0 8px rgba(255,215,0,0.8),0 0 16px rgba(255,215,0,0.4);flex-shrink:0;}
+
+    /* SECTION GLOW */
+    .section-glow{position:relative;}
+    .section-glow::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(112,41,188,0.08) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .fade-up{animation:fadeUp 0.5s ease forwards;}
+
+    /* pinned glow */
+    @keyframes pinPulse{0%,100%{box-shadow:0 0 6px rgba(255,215,0,0.3);}50%{box-shadow:0 0 14px rgba(255,215,0,0.6);}}
+    .pinned-card{border-color:rgba(255,215,0,0.2) !important;animation:pinPulse 3s ease-in-out infinite;}
+  </style>
+</head>
+<body>
+
+<!-- BG Canvas -->
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+
+<!-- SOCIAL SIDEBAR -->
+<aside class="social-sidebar" aria-label="Sosyal medya">
+  <a href="#" class="social-btn" aria-label="Discord"><iconify-icon icon="ic:baseline-discord"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="GitHub"><iconify-icon icon="mdi:github"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="Twitter X"><iconify-icon icon="ri:twitter-x-fill"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="Instagram"><iconify-icon icon="mdi:instagram"></iconify-icon></a>
+  <a href="#" class="social-btn" aria-label="YouTube"><iconify-icon icon="mdi:youtube"></iconify-icon></a>
+</aside>
+
+<!-- HEADER -->
+<header class="site-header" id="site-header">
+  <nav class="navbar-inner" role="navigation" aria-label="Ana gezinme">
+    <a href="index.html" class="nav-logo" aria-label="Lumos">
+      <img src="assets/icon/lumosy.png" alt="Lumos" onerror="this.style.display='none'">
+      LUMOS
+    </a>
+    <div class="nav-links">
+      <a href="index.html" id="nav-home" class="nav-link"><iconify-icon icon="solar:home-bold"></iconify-icon>Anasayfa</a>
+      <a href="forum.html" id="nav-forum" class="nav-link active"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>Forumlar</a>
+      <a href="devs-matching.html" id="nav-tinder" class="nav-link"><iconify-icon icon="solar:users-group-two-rounded-bold"></iconify-icon>Dev Match</a>
+      <a href="#" id="nav-ai" class="nav-link"><iconify-icon icon="solar:cpu-bolt-bold"></iconify-icon>AI Portfoy</a>
+      <a href="#" id="nav-docs" class="nav-link"><iconify-icon icon="solar:document-text-bold"></iconify-icon>Dokumanlar</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-cta-cluster">
+        <a href="#" class="nav-notif-link" id="nav-notif">
+          <iconify-icon icon="solar:bell-bold" style="font-size:16px;"></iconify-icon>
+          <span class="notif-label" style="font-size:14px;">Bildirimler</span>
+          <span class="notif-dot"></span>
+        </a>
+        <a href="#" class="nav-cta-btn" id="nav-profile">
+          <iconify-icon icon="mdi:account" style="font-size:16px;"></iconify-icon>
+          Profil
+        </a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- PAGE SPACER -->
+<div style="height:80px;"></div>
+
+<!-- ===== PAGE HEADER ===== -->
+<div style="position:relative;z-index:3;max-width:1400px;margin:0 auto;padding:28px 20px 20px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+    <div class="glow-dot"></div>
+    <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,215,0,0.7);">Lumos Network</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">
+    <div>
+      <h1 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;line-height:1.15;">
+        Forum <span class="gold-shimmer">Command Center</span>
+        <span class="cursor"></span>
+      </h1>
+      <p style="color:rgba(255,255,255,0.4);font-size:0.875rem;margin-top:6px;font-family:'JetBrains Mono',monospace;">&gt; 12,847 gelistirici &bull; 3,412 aktif konu &bull; 98,340 mesaj</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button class="new-post-btn" id="new-post-btn" onclick="openNewPost()">
+        <iconify-icon icon="mdi:plus" style="font-size:16px;"></iconify-icon>
+        Yeni Konu
+      </button>
+      <button onclick="openNewPost()" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:11px;background:transparent;border:1px solid rgba(112,41,188,0.4);color:#a855f7;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.3s ease;font-family:'Inter',sans-serif;" onmouseover="this.style.background='rgba(112,41,188,0.1)'" onmouseout="this.style.background='transparent'">
+        <iconify-icon icon="mdi:filter-variant" style="font-size:16px;"></iconify-icon>
+        Filtrele
+      </button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div style="position:relative;margin-top:20px;max-width:600px;">
+    <iconify-icon icon="mdi:magnify" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;color:rgba(255,255,255,0.25);pointer-events:none;"></iconify-icon>
+    <input id="forum-search" type="text" class="search-input" placeholder="Konu, etiket veya kullanici ara..." oninput="filterCards(this.value)" aria-label="Forum arama"/>
+  </div>
+</div>
+
+<!-- ===== 3-COLUMN GRID ===== -->
+<main style="position:relative;z-index:3;max-width:1400px;margin:0 auto;padding:0 20px 60px;display:grid;grid-template-columns:220px 1fr 280px;gap:20px;align-items:start;" id="main-grid">
+
+  <!-- ========== LEFT: CATEGORIES ========== -->
+  <aside id="left-col" style="position:sticky;top:90px;">
+    <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;margin-bottom:16px;">
+      <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.25);margin-bottom:12px;padding:0 4px;">Kategoriler</p>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <button class="cat-btn active" id="cat-all" onclick="setCategory(this,'all')" aria-pressed="true">
+          <iconify-icon icon="solar:flame-bold"></iconify-icon>
+          Tumu
+          <span class="cat-count">3.4K</span>
+        </button>
+        <button class="cat-btn" id="cat-trend" onclick="setCategory(this,'trending')" aria-pressed="false">
+          <iconify-icon icon="mdi:trending-up"></iconify-icon>
+          Trending
+          <span class="cat-count">128</span>
+        </button>
+        <button class="cat-btn" id="cat-react" onclick="setCategory(this,'react')" aria-pressed="false">
+          <iconify-icon icon="mdi:react"></iconify-icon>
+          React / Next.js
+          <span class="cat-count">411</span>
+        </button>
+        <button class="cat-btn" id="cat-py" onclick="setCategory(this,'python')" aria-pressed="false">
+          <iconify-icon icon="mdi:language-python"></iconify-icon>
+          Python
+          <span class="cat-count">638</span>
+        </button>
+        <button class="cat-btn" id="cat-ai" onclick="setCategory(this,'ai')" aria-pressed="false">
+          <iconify-icon icon="solar:cpu-bolt-bold"></iconify-icon>
+          AI / ML
+          <span class="cat-count">297</span>
+        </button>
+        <button class="cat-btn" id="cat-devops" onclick="setCategory(this,'devops')" aria-pressed="false">
+          <iconify-icon icon="mdi:kubernetes"></iconify-icon>
+          DevOps / Cloud
+          <span class="cat-count">184</span>
+        </button>
+        <button class="cat-btn" id="cat-db" onclick="setCategory(this,'database')" aria-pressed="false">
+          <iconify-icon icon="mdi:database"></iconify-icon>
+          Database
+          <span class="cat-count">223</span>
+        </button>
+        <button class="cat-btn" id="cat-ts" onclick="setCategory(this,'typescript')" aria-pressed="false">
+          <iconify-icon icon="mdi:language-typescript"></iconify-icon>
+          TypeScript
+          <span class="cat-count">319</span>
+        </button>
+        <button class="cat-btn" id="cat-cs" onclick="setCategory(this,'csharp')" aria-pressed="false">
+          <iconify-icon icon="mdi:language-csharp"></iconify-icon>
+          C# / .NET
+          <span class="cat-count">176</span>
+        </button>
+        <button class="cat-btn" id="cat-go" onclick="setCategory(this,'golang')" aria-pressed="false">
+          <iconify-icon icon="simple-icons:go"></iconify-icon>
+          Go
+          <span class="cat-count">94</span>
+        </button>
+        <button class="cat-btn" id="cat-career" onclick="setCategory(this,'career')" aria-pressed="false">
+          <iconify-icon icon="solar:case-round-bold"></iconify-icon>
+          Kariyer
+          <span class="cat-count">265</span>
+        </button>
+        <button class="cat-btn" id="cat-show" onclick="setCategory(this,'showcase')" aria-pressed="false">
+          <iconify-icon icon="mdi:rocket-launch"></iconify-icon>
+          Proje Showcase
+          <span class="cat-count">158</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;">
+      <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.25);margin-bottom:12px;">Istatistikler</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Bugun aktif</span>
+          <span style="font-size:0.8rem;font-weight:700;color:#4ade80;">1,247</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Yeni gonderiler</span>
+          <span style="font-size:0.8rem;font-weight:700;color:#FFD700;">+84</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Cevaplanan</span>
+          <span style="font-size:0.8rem;font-weight:700;color:#a855f7;">97%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Ort. yanitlanma</span>
+          <span style="font-size:0.8rem;font-weight:700;color:#fff;">14 dk</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========== MIDDLE: MAIN FEED ========== -->
+  <section id="middle-col">
+
+    <!-- Tabs -->
+    <div style="display:flex;align-items:center;gap:4px;margin-bottom:18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:5px;">
+      <button class="tab-btn active" id="tab-hot" onclick="setTab(this)" style="flex:1;padding:8px 14px;border-radius:8px;border:none;background:#FFD700;color:#000;font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.25s ease;font-family:'Inter',sans-serif;">
+        <iconify-icon icon="mdi:fire" style="font-size:13px;margin-right:4px;"></iconify-icon>Hot
+      </button>
+      <button class="tab-btn" id="tab-new" onclick="setTab(this)" style="flex:1;padding:8px 14px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.5);font-weight:600;font-size:0.8rem;cursor:pointer;transition:all 0.25s ease;font-family:'Inter',sans-serif;">
+        <iconify-icon icon="mdi:new-box" style="font-size:13px;margin-right:4px;"></iconify-icon>Yeni
+      </button>
+      <button class="tab-btn" id="tab-top" onclick="setTab(this)" style="flex:1;padding:8px 14px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.5);font-weight:600;font-size:0.8rem;cursor:pointer;transition:all 0.25s ease;font-family:'Inter',sans-serif;">
+        <iconify-icon icon="mdi:trophy-outline" style="font-size:13px;margin-right:4px;"></iconify-icon>Top
+      </button>
+      <button class="tab-btn" id="tab-unans" onclick="setTab(this)" style="flex:1;padding:8px 14px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.5);font-weight:600;font-size:0.8rem;cursor:pointer;transition:all 0.25s ease;font-family:'Inter',sans-serif;">
+        <iconify-icon icon="mdi:help-circle-outline" style="font-size:13px;margin-right:4px;"></iconify-icon>Yanitlanmadi
+      </button>
+    </div>
+
+    <!-- PINNED POST -->
+    <article class="forum-card pinned-card" id="fc-pinned" data-tags="all react trending" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+        <iconify-icon icon="mdi:pin" style="font-size:13px;color:#FFD700;"></iconify-icon>
+        <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#FFD700;">Sabitlenen Duyuru</span>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div class="vote-btn voted" id="vote-pinned" onclick="vote(this)">
+          <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+          <span>247</span>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+            <div class="avatar" style="background:linear-gradient(135deg,#FFD700,#CC9F00);color:#000;width:32px;height:32px;font-size:0.75rem;">LM</div>
+            <div>
+              <p style="color:#FFD700;font-weight:700;font-size:0.875rem;">Lumos Admin</p>
+              <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">3 saat once</p>
+            </div>
+            <span class="topic-tag" style="margin-left:auto;"><iconify-icon icon="mdi:pin" style="font-size:10px;"></iconify-icon>Pinned</span>
+          </div>
+          <h2 style="color:#FFD700;font-weight:800;font-size:1rem;margin-bottom:8px;line-height:1.4;">Lumos v2.0 Yayina Girdi &mdash; AI Portfoy, Dev Match ve Yeni Forum Motoru</h2>
+          <p style="color:rgba(255,255,255,0.45);font-size:0.875rem;line-height:1.65;margin-bottom:14px;">Topluluğumuzun talepleri doğrultusunda geliştirilen v2.0 büyük güncellemesinde yapay zeka destekli portfoy oluşturucu, geliştirici eşleştirme sistemi ve yeni forum motorumuz canlıya alınmıştır...</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="skill-tag gold">React</span>
+            <span class="skill-tag green">Node.js</span>
+            <span class="skill-tag">AI</span>
+          </div>
+        </div>
+        <!-- Terminal dekor -->
+        <div style="flex-shrink:0;opacity:0.15;display:flex;flex-direction:column;gap:3px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:#FFD700;align-self:flex-start;margin-top:4px;">
+          <span>&gt;_</span>
+          <span>v2.0</span>
+        </div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:12px;margin-top:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.35);background:none;border:none;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.35)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>84 yorum</button>
+        <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.35);background:none;border:none;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.35)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+        <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.35);background:none;border:none;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.35)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+        <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.2);font-family:'JetBrains Mono',monospace;">4,312 gorunum</span>
+      </div>
+    </article>
+
+    <!-- FORUM CARDS -->
+    <div id="forum-feed" style="display:flex;flex-direction:column;gap:12px;">
+
+      <!-- Card 1 -->
+      <article class="forum-card fade-up" id="fc-1" data-tags="all react trending" style="animation-delay:0.05s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-1" onclick="vote(this)" aria-label="Oy ver">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>142</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;"><span>AK</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Ahmet K. <span style="color:#FFD700;font-size:0.7rem;font-weight:700;">⭐ Warden</span></p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">2 saat once &bull; #react</p>
+              </div>
+              <span class="topic-tag" style="margin-left:auto;"><iconify-icon icon="mdi:fire" style="font-size:10px;"></iconify-icon>Trending</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">React 19 Concurrent Mode &mdash; Performans problemini nasil cozduk?</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">useTransition + Suspense kombonu kullanarak buyuk listelerde ciddi FPS artisi sagladim. Gercek benchmark sonuclari ile detayli analiz paylasiyor...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag blue">React</span>
+              <span class="skill-tag blue">TypeScript</span>
+              <span class="skill-tag">Concurrent</span>
+            </div>
+          </div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.08;align-self:flex-start;" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="#a855f7" stroke-width="1.5"/>
+            <path d="M7 8h10M7 12h7M7 16h5" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>38</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">2,841 gorunum</span>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="forum-card fade-up" id="fc-2" data-tags="all python ai" style="animation-delay:0.1s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-2" onclick="vote(this)">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>98</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#10b981,#065f46);color:#fff;"><span>ES</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Elif S. <span style="color:#a855f7;font-size:0.7rem;font-weight:700;">◆ Elite</span></p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">5 saat once &bull; #python #ai</p>
+              </div>
+              <span class="topic-tag green" style="margin-left:auto;">Rehber</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">FastAPI + LangChain &mdash; Production-grade RAG pipeline kurulumu</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Vektor veritabani secimi, embedding stratejisi ve retrieval optimizasyonu uzerine kapsamli bir rehber. Chroma, Pinecone ve Weaviate karsilastirmasi...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag green">Python</span>
+              <span class="skill-tag">LangChain</span>
+              <span class="skill-tag gold">AI/ML</span>
+            </div>
+          </div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.08;align-self:flex-start;" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="#4ade80" stroke-width="1.5"/>
+            <path d="M9 12l2 2 4-4" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>21</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">1,654 gorunum</span>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="forum-card fade-up" id="fc-3" data-tags="all devops trending" style="animation-delay:0.15s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-3" onclick="vote(this)">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>214</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#f97316,#9a3412);color:#fff;"><span>MD</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Mert D.</p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">1 gun once &bull; #devops</p>
+              </div>
+              <span class="topic-tag" style="margin-left:auto;"><iconify-icon icon="mdi:fire" style="font-size:10px;"></iconify-icon>Hot</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">Kubernetes &mdash; Sifir downtime deployment: Blue-Green vs Canary</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Her iki stratejiyi de production ortaminda test ettim. Hangisi maliyet ve guvenilirlik acisindan daha avantajli? Detayli benchmark ve YAML ornekleri...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag">K8s</span>
+              <span class="skill-tag blue">Docker</span>
+              <span class="skill-tag green">CI/CD</span>
+            </div>
+          </div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.08;align-self:flex-start;" aria-hidden="true">
+            <path d="M12 3L3 8.5v7L12 21l9-5.5v-7L12 3z" stroke="#f97316" stroke-width="1.5"/>
+            <path d="M12 3v18M3 8.5l9 4.5 9-4.5" stroke="#f97316" stroke-width="1.2" stroke-dasharray="2 2"/>
+          </svg>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>67</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">5,890 gorunum</span>
+        </div>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="forum-card fade-up" id="fc-4" data-tags="all ai trending" style="animation-delay:0.2s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-4" onclick="vote(this)">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>389</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#8b5cf6,#4c1d95);color:#fff;"><span>CO</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Can O. <span style="color:#FFD700;font-size:0.7rem;font-weight:700;">⭐ Warden</span></p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">6 saat once &bull; #ai</p>
+              </div>
+              <span class="topic-tag" style="margin-left:auto;"><iconify-icon icon="mdi:fire" style="font-size:10px;"></iconify-icon>Trending</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">GPT-4o ile kendi kod review asistanini sifirdan yazdim</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">GitHub webhook + OpenAI API + Slack entegrasyonu. PR acildiginda otomatik inceleme ve oneride bulunuyor. Kaynak kod ve kurulum kilavuzu icinde...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag gold">AI/ML</span>
+              <span class="skill-tag green">Python</span>
+              <span class="skill-tag">OpenAI</span>
+              <span class="skill-tag blue">GitHub</span>
+            </div>
+          </div>
+          <div style="flex-shrink:0;opacity:0.1;font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:#a855f7;align-self:flex-start;line-height:1.8;">
+            <div>&gt;_init</div>
+            <div>OK</div>
+            <div>...</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>94</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">9,120 gorunum</span>
+        </div>
+      </article>
+
+      <!-- Card 5 -->
+      <article class="forum-card fade-up" id="fc-5" data-tags="all typescript" style="animation-delay:0.25s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-5" onclick="vote(this)">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>76</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#0ea5e9,#075985);color:#fff;"><span>ZA</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Zeynep A.</p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">3 saat once &bull; #typescript</p>
+              </div>
+              <span class="topic-tag purple" style="margin-left:auto;">Soru</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">TypeScript 5.x Generic Variance Annotations nasil kullanilir?</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">in ve out anahtar kelimelerinin type-safety uzerindeki etkisini gercek kod ornekleri ile anlamaya calisiyorum. Ornek proje linki de ekledim...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag blue">TypeScript</span>
+              <span class="skill-tag">Generics</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>29</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">1,230 gorunum</span>
+        </div>
+      </article>
+
+      <!-- Card 6 -->
+      <article class="forum-card fade-up" id="fc-6" data-tags="all database" style="animation-delay:0.3s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-6" onclick="vote(this)">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>163</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#ec4899,#9d174d);color:#fff;"><span>BT</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Berk T. <span style="color:#a855f7;font-size:0.7rem;font-weight:700;">◆ Elite</span></p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">12 saat once &bull; #database</p>
+              </div>
+              <span class="topic-tag green" style="margin-left:auto;">Rehber</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">PostgreSQL EXPLAIN ANALYZE &mdash; Ciktisini nasil okurum?</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Seq Scan, Index Scan, Hash Join... Hangi node ne anlama geliyor? Gercek bir slow query uzerinden adim adim detayli analiz...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag red">PostgreSQL</span>
+              <span class="skill-tag">SQL</span>
+              <span class="skill-tag green">Performance</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>41</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">3,412 gorunum</span>
+        </div>
+      </article>
+
+      <!-- Card 7 -->
+      <article class="forum-card fade-up" id="fc-7" data-tags="all csharp" style="animation-delay:0.35s;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div class="vote-btn" id="vote-7" onclick="vote(this)">
+            <iconify-icon icon="mdi:chevron-up" style="font-size:16px;"></iconify-icon>
+            <span>57</span>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <div class="avatar" style="background:linear-gradient(135deg,#6366f1,#312e81);color:#fff;"><span>OY</span></div>
+              <div>
+                <p style="color:#fff;font-weight:600;font-size:0.8rem;">Onur Y.</p>
+                <p style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">8 saat once &bull; #csharp</p>
+              </div>
+              <span class="topic-tag purple" style="margin-left:auto;">Tartisma</span>
+            </div>
+            <h3 style="color:#FFD700;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.45;">C# 12 Primary Constructors &mdash; Gercekten faydalı mi?</h3>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Primary Constructor'larin okunabilirlik ve bakım acisindan degerlendirmesi. Record'lardan farki nedir? Pratik ornekler...</p>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+              <span class="skill-tag blue">C#</span>
+              <span class="skill-tag">.NET 8</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:10px;display:flex;align-items:center;gap:14px;">
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="solar:chat-line-outline" style="font-size:14px;"></iconify-icon>22</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:share-variant-outline" style="font-size:14px;"></iconify-icon>Paylas</button>
+          <button style="display:flex;align-items:center;gap:5px;font-size:0.8rem;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><iconify-icon icon="mdi:bookmark-outline" style="font-size:14px;"></iconify-icon>Kaydet</button>
+          <span style="margin-left:auto;font-size:0.72rem;color:rgba(255,255,255,0.18);font-family:'JetBrains Mono',monospace;">874 gorunum</span>
+        </div>
+      </article>
+
+    </div><!-- /#forum-feed -->
+
+    <!-- Empty state -->
+    <div id="empty-state" style="display:none;text-align:center;padding:48px 16px;color:rgba(255,255,255,0.25);">
+      <iconify-icon icon="mdi:magnify-remove-outline" style="font-size:48px;display:block;margin:0 auto 12px;"></iconify-icon>
+      <p style="font-size:0.9rem;">Aramanizla eslesen konu bulunamadi.</p>
+    </div>
+
+    <!-- Load more -->
+    <div style="display:flex;justify-content:center;margin-top:24px;">
+      <button id="load-more" onclick="loadMore(this)" style="display:flex;align-items:center;gap:8px;padding:12px 28px;border-radius:11px;border:1px solid rgba(112,41,188,0.3);background:rgba(112,41,188,0.05);color:#a855f7;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.3s ease;font-family:'Inter',sans-serif;" onmouseover="this.style.borderColor='rgba(112,41,188,0.6)';this.style.background='rgba(112,41,188,0.1)'" onmouseout="this.style.borderColor='rgba(112,41,188,0.3)';this.style.background='rgba(112,41,188,0.05)'">
+        <iconify-icon icon="mdi:dots-horizontal" style="font-size:16px;"></iconify-icon>
+        Daha Fazla Yukle
+      </button>
+    </div>
+  </section>
+
+  <!-- ========== RIGHT: LEADERBOARD ========== -->
+  <aside id="right-col" style="position:sticky;top:90px;">
+
+    <!-- Warden's Elite -->
+    <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <iconify-icon icon="mdi:shield-star" style="font-size:18px;color:#FFD700;"></iconify-icon>
+        <h2 style="font-size:0.875rem;font-weight:800;color:#fff;">Warden&rsquo;s Elite</h2>
+        <span style="margin-left:auto;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.25);">Bu Hafta</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div class="leader-row" id="leader-1">
+          <div class="rank-badge rank-1">1</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#FFD700,#CC9F00);color:#000;width:34px;height:34px;font-size:0.75rem;">CO</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Can Oz. <span style="color:#FFD700;font-size:0.65rem;">⭐</span></p>
+            <div class="xp-bar-track"><div class="xp-bar-fill gold" style="width:95%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:#FFD700;font-family:'JetBrains Mono',monospace;">9,820</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+
+        <div class="leader-row" id="leader-2">
+          <div class="rank-badge rank-2">2</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#10b981,#065f46);color:#fff;width:34px;height:34px;font-size:0.75rem;">ES</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:600;font-size:0.82rem;">Elif S. <span style="color:#a855f7;font-size:0.65rem;">◆</span></p>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:82%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:#a855f7;font-family:'JetBrains Mono',monospace;">8,140</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+
+        <div class="leader-row" id="leader-3">
+          <div class="rank-badge rank-3">3</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;width:34px;height:34px;font-size:0.75rem;">AK</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:600;font-size:0.82rem;">Ahmet K. <span style="color:#FFD700;font-size:0.65rem;">⭐</span></p>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:74%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:#a855f7;font-family:'JetBrains Mono',monospace;">7,380</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+
+        <div class="leader-row" id="leader-4">
+          <div class="rank-badge rank-n">4</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#f97316,#9a3412);color:#fff;width:34px;height:34px;font-size:0.75rem;">MD</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:600;font-size:0.82rem;">Mert D.</p>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:61%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;">6,120</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+
+        <div class="leader-row" id="leader-5">
+          <div class="rank-badge rank-n">5</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#ec4899,#9d174d);color:#fff;width:34px;height:34px;font-size:0.75rem;">BT</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:600;font-size:0.82rem;">Berk T. <span style="color:#a855f7;font-size:0.65rem;">◆</span></p>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:52%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;">5,250</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+
+        <div class="leader-row" id="leader-6">
+          <div class="rank-badge rank-n">6</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#0ea5e9,#075985);color:#fff;width:34px;height:34px;font-size:0.75rem;">ZA</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:600;font-size:0.82rem;">Zeynep A.</p>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:44%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;">4,480</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+
+        <div class="leader-row" id="leader-7">
+          <div class="rank-badge rank-n">7</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#6366f1,#312e81);color:#fff;width:34px;height:34px;font-size:0.75rem;">OY</div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#fff;font-weight:600;font-size:0.82rem;">Onur Y.</p>
+            <div class="xp-bar-track"><div class="xp-bar-fill" style="width:35%;"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-size:0.8rem;font-weight:900;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;">3,590</p>
+            <p style="font-size:0.65rem;color:rgba(255,255,255,0.25);">XP</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);text-align:center;">
+        <a href="#" id="full-lb-link" style="font-size:0.78rem;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#FFD700'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+          Tam Liderlik Tablosunu Gor &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Active Now -->
+    <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,0.6);animation:pg 2s ease-in-out infinite;flex-shrink:0;"></div>
+        <h2 style="font-size:0.875rem;font-weight:800;color:#fff;">Simdi Aktif</h2>
+        <span style="margin-left:auto;font-size:0.65rem;color:rgba(255,255,255,0.3);">1,247 online</span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div style="display:flex;">
+          <div class="avatar" style="background:linear-gradient(135deg,#FFD700,#CC9F00);color:#000;width:28px;height:28px;font-size:0.65rem;border:2px solid #000;">CO</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#10b981,#065f46);color:#fff;width:28px;height:28px;font-size:0.65rem;border:2px solid #000;margin-left:-8px;">ES</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;width:28px;height:28px;font-size:0.65rem;border:2px solid #000;margin-left:-8px;">AK</div>
+          <div class="avatar" style="background:linear-gradient(135deg,#f97316,#9a3412);color:#fff;width:28px;height:28px;font-size:0.65rem;border:2px solid #000;margin-left:-8px;">MD</div>
+          <div class="avatar" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);width:28px;height:28px;font-size:0.6rem;border:2px solid #000;margin-left:-8px;">+1K</div>
+        </div>
+        <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-left:10px;">gelistirici aktif</p>
+      </div>
+    </div>
+
+    <!-- Terminal Widget -->
+    <div style="background:#000;border:1px solid rgba(112,41,188,0.3);border-radius:16px;padding:16px;font-family:'JetBrains Mono',monospace;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#ff5f56;"></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:#ffbd2e;"></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:#27c93f;"></div>
+        <span style="font-size:0.65rem;color:rgba(255,255,255,0.2);margin-left:6px;">lumos@network ~ $</span>
+      </div>
+      <div id="terminal-log" style="font-size:0.7rem;line-height:2;color:rgba(255,255,255,0.4);">
+        <div><span style="color:#a855f7;">&gt;</span> <span style="color:#FFD700;">Can O.</span> yanıt verdi</div>
+        <div><span style="color:#a855f7;">&gt;</span> <span style="color:#4ade80;">Elif S.</span> konu açtı</div>
+        <div><span style="color:#a855f7;">&gt;</span> <span style="color:#60a5fa;">Ahmet K.</span> +42 XP</div>
+        <div><span style="color:#a855f7;">&gt;</span> <span style="color:#FFD700;">Mert D.</span> çözüm işaretledi</div>
+        <div id="terminal-cursor-line"><span style="color:#a855f7;">&gt;</span> <span style="color:rgba(255,255,255,0.2);">_</span><span class="cursor" style="width:6px;height:11px;"></span></div>
+      </div>
+    </div>
+
+  </aside>
+
+</main>
+
+<!-- FOOTER -->
+<footer style="position:relative;z-index:3;background:#000;border-top:1px solid rgba(255,255,255,0.06);padding:32px 20px;max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+  <p style="font-size:0.78rem;color:rgba(255,255,255,0.2);">&copy; 2026 Lumos Developer Universe. Tum haklari saklidir.</p>
+  <div style="display:flex;gap:18px;flex-wrap:wrap;">
+    <a href="index.html" style="font-size:0.78rem;color:rgba(255,255,255,0.3);text-decoration:none;" onmouseover="this.style.color='#FFD700'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Anasayfa</a>
+    <a href="#" style="font-size:0.78rem;color:rgba(255,255,255,0.3);text-decoration:none;" onmouseover="this.style.color='#FFD700'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Gizlilik</a>
+    <a href="#" style="font-size:0.78rem;color:rgba(255,255,255,0.3);text-decoration:none;" onmouseover="this.style.color='#FFD700'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Kullanim Sartlari</a>
+  </div>
+</footer>
+
+<!-- NEW POST MODAL -->
+<div id="post-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#0a0a0a;border:1px solid rgba(112,41,188,0.4);border-radius:20px;width:100%;max-width:580px;padding:28px;box-shadow:0 0 40px rgba(112,41,188,0.15);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+      <h2 style="font-size:1.1rem;font-weight:800;color:#fff;">Yeni Konu Ac</h2>
+      <button onclick="closeModal()" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" aria-label="Kapat">
+        <iconify-icon icon="mdi:close"></iconify-icon>
+      </button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Baslik</label>
+        <input id="modal-title" type="text" placeholder="Konu basligini girin..." style="width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;font-size:0.875rem;color:#fff;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.25s;" onfocus="this.style.borderColor='rgba(112,41,188,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" aria-label="Baslik"/>
+      </div>
+      <div>
+        <label style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Kategori</label>
+        <select id="modal-cat" style="width:100%;background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;font-size:0.875rem;color:#fff;font-family:'Inter',sans-serif;outline:none;" aria-label="Kategori">
+          <option>React / Next.js</option>
+          <option>Python</option>
+          <option>AI / ML</option>
+          <option>DevOps / Cloud</option>
+          <option>Database</option>
+          <option>TypeScript</option>
+          <option>C# / .NET</option>
+          <option>Kariyer</option>
+          <option>Proje Showcase</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Icerik</label>
+        <textarea id="modal-body" rows="5" placeholder="Konunu detayli anlat..." style="width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;font-size:0.875rem;color:#fff;font-family:'Inter',sans-serif;outline:none;resize:vertical;transition:border-color 0.25s;" onfocus="this.style.borderColor='rgba(112,41,188,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" aria-label="Icerik"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+        <button onclick="closeModal()" style="padding:10px 20px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);font-size:0.875rem;cursor:pointer;font-family:'Inter',sans-serif;">Iptal</button>
+        <button onclick="submitPost()" class="new-post-btn" style="padding:10px 24px;">
+          <iconify-icon icon="mdi:send" style="font-size:14px;"></iconify-icon>
+          Gonder
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CATEGORY FILTER =====
+let activeCat = 'all';
+function setCategory(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+  btn.classList.add('active');
+  btn.setAttribute('aria-pressed','true');
+  activeCat = cat;
+  filterCards(document.getElementById('forum-search').value);
+}
+
+function filterCards(q) {
+  const cards = document.querySelectorAll('#forum-feed .forum-card');
+  let visible = 0;
+  cards.forEach(c => {
+    const tags = c.dataset.tags || '';
+    const text = c.innerText.toLowerCase();
+    const catMatch = activeCat === 'all' || tags.includes(activeCat);
+    const qMatch = !q || text.includes(q.toLowerCase());
+    if (catMatch && qMatch) { c.style.display = ''; visible++; }
+    else { c.style.display = 'none'; }
+  });
+  document.getElementById('empty-state').style.display = visible === 0 ? 'block' : 'none';
+}
+
+// ===== TABS =====
+function setTab(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.color = 'rgba(255,255,255,0.5)';
+    b.style.fontWeight = '600';
+  });
+  btn.style.background = '#FFD700';
+  btn.style.color = '#000';
+  btn.style.fontWeight = '700';
+}
+
+// ===== VOTE =====
+function vote(btn) {
+  const span = btn.querySelector('span');
+  const voted = btn.classList.toggle('voted');
+  let n = parseInt(span.textContent);
+  span.textContent = voted ? n + 1 : n - 1;
+}
+
+// ===== MODAL =====
+const modal = document.getElementById('post-modal');
+function openNewPost() { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeModal() { modal.style.display = 'none'; document.body.style.overflow = ''; }
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+function submitPost() {
+  const t = document.getElementById('modal-title').value.trim();
+  if (!t) { document.getElementById('modal-title').style.borderColor='rgba(239,68,68,0.5)'; return; }
+  closeModal();
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#0a0a0a;border:1px solid rgba(112,41,188,0.5);border-radius:12px;padding:14px 20px;font-size:0.875rem;color:#fff;z-index:999;display:flex;align-items:center;gap:10px;box-shadow:0 0 20px rgba(112,41,188,0.2);';
+  toast.innerHTML = '<iconify-icon icon="mdi:check-circle" style="font-size:18px;color:#4ade80;"></iconify-icon> Konunuz gonderildi!';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ===== LOAD MORE =====
+function loadMore(btn) {
+  btn.innerHTML = '<iconify-icon icon="mdi:loading" style="font-size:16px;animation:spin 1s linear infinite;"></iconify-icon> Yukleniyor...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '<iconify-icon icon="mdi:check" style="font-size:16px;"></iconify-icon> Tumu Yuklendi';
+    btn.style.borderColor = 'rgba(255,215,0,0.3)';
+    btn.style.color = '#FFD700';
+  }, 1400);
+}
+
+// ===== TERMINAL LIVE FEED =====
+const logs = [
+  ['#FFD700','Selin K.','yeni konu acti'],
+  ['#4ade80','Burak M.','+28 XP kazandi'],
+  ['#60a5fa','Ece T.','cevap verdi'],
+  ['#a855f7','Kaan D.','cozum isaretledi'],
+  ['#f87171','Yusuf A.','badge kazandi 🏅'],
+  ['#FFD700','Nil O.','yeni konu acti'],
+  ['#4ade80','Hasan B.','+55 XP kazandi'],
+];
+let li = 0;
+const tlog = document.getElementById('terminal-log');
+setInterval(() => {
+  const [col, name, act] = logs[li % logs.length];
+  const line = document.createElement('div');
+  line.innerHTML = `<span style="color:#a855f7;">&gt;</span> <span style="color:${col};">${name}</span> ${act}`;
+  line.style.opacity = '0';
+  line.style.transition = 'opacity 0.4s';
+  tlog.insertBefore(line, document.getElementById('terminal-cursor-line'));
+  requestAnimationFrame(() => { line.style.opacity = '1'; });
+  const lines = tlog.querySelectorAll('div:not(#terminal-cursor-line)');
+  if (lines.length > 5) lines[0].remove();
+  li++;
+}, 2500);
+
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes pg{0%,100%{box-shadow:0 0 4px rgba(34,197,94,0.5);}50%{box-shadow:0 0 12px rgba(34,197,94,0.8);}}
+</script>
+
+<!-- RESPONSIVE -->
+<style>
+@media(max-width:1100px){#main-grid{grid-template-columns:180px 1fr 240px;}}
+@media(max-width:860px){#main-grid{grid-template-columns:1fr;}.social-sidebar{display:none;}#left-col,#right-col{position:static;}}
+@media(max-width:600px){#main-grid{padding:0 12px 40px;}}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes pg{0%,100%{box-shadow:0 0 4px rgba(34,197,94,0.5);}50%{box-shadow:0 0 12px rgba(34,197,94,0.8);}}
+</style>
+
+<!-- BG PARTICLES -->
+<script>
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',()=>{resize();spawn();});
+  const r=(a,b)=>a+Math.random()*(b-a);
+  const N=70; let P=[];
+  function mk(){return{x:r(0,c.width),y:r(-20,c.height+20),size:r(1.2,3.8),vy:r(.15,.55),vx:r(-.12,.12),alpha:r(.05,.6),aT:r(.05,.7),aS:r(.006,.022),gP:r(0,Math.PI*2),gS:r(.012,.045),purple:Math.random()>.45};}
+  function spawn(){P=[];for(let i=0;i<N;i++)P.push(mk());}
+  spawn();
+  function draw(p){
+    const g=.5+.5*Math.sin(p.gP),gr=p.size*(2+g*2.5);
+    const gd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,gr);
+    if(p.purple){gd.addColorStop(0,'rgba(112,41,188,'+p.alpha*.8+')');gd.addColorStop(.4,'rgba(150,80,220,'+p.alpha*.3+')');gd.addColorStop(1,'rgba(112,41,188,0)');}
+    else{gd.addColorStop(0,'rgba(255,215,0,'+p.alpha*.7+')');gd.addColorStop(.4,'rgba(255,185,0,'+p.alpha*.25+')');gd.addColorStop(1,'rgba(255,215,0,0)');}
+    ctx.beginPath();ctx.arc(p.x,p.y,gr,0,Math.PI*2);ctx.fillStyle=gd;ctx.fill();
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size*.5,0,Math.PI*2);
+    ctx.fillStyle=p.purple?'rgba(160,100,230,'+p.alpha+')':'rgba(255,230,80,'+p.alpha+')';ctx.fill();
+  }
+  function tick(){
+    ctx.clearRect(0,0,c.width,c.height);
+    for(const p of P){
+      p.x+=p.vx;p.y+=p.vy;
+      p.vx+=r(-.002,.002);p.vx=Math.max(-.25,Math.min(.25,p.vx));
+      if(Math.abs(p.alpha-p.aT)<.01)p.aT=r(.05,.7);
+      p.alpha=p.alpha<p.aT?Math.min(p.aT,p.alpha+p.aS):Math.max(p.aT,p.alpha-p.aS);
+      p.gP+=p.gS;
+      if(p.y>c.height+20||p.x<-30||p.x>c.width+30)Object.assign(p,mk());
+      draw(p);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+</body>
+</html>
